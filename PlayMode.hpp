@@ -28,15 +28,28 @@ struct PlayMode : Mode {
 	Scene scene;
 
 	//hexapod leg to wobble:
-	Scene::Transform *hip = nullptr;
-	Scene::Transform *upper_leg = nullptr;
-	Scene::Transform *lower_leg = nullptr;
-	glm::quat hip_base_rotation;
-	glm::quat upper_leg_base_rotation;
-	glm::quat lower_leg_base_rotation;
-	float wobble = 0.0f;
+	// Scene::Transform *hip = nullptr;
+	// Scene::Transform *upper_leg = nullptr;
+	// Scene::Transform *lower_leg = nullptr;
+	// glm::quat hip_base_rotation;
+	// glm::quat upper_leg_base_rotation;
+	// glm::quat lower_leg_base_rotation;
+	// float wobble = 0.0f;
+
+	//train
+	// glm::quat hip_base_rotation;
+	Scene::Transform *train = nullptr;
+	float train_speed = 0.01f;
+
+	// score
+	int score = 0;
+
+	// switch
+	int switch_position = 0; // -1 is to the left, 1 is to the right 
+
 	
 	//camera:
 	Scene::Camera *camera = nullptr;
+	glm::quat camera_base_rotation;
 
 };
