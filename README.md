@@ -1,8 +1,8 @@
-# (TODO: your game's title)
+# Trolley Solution
 
-Author: (TODO: your name)
+Author: Aren Davey
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: You are a trolley operator and you have no choice but to kill one of two groups of people on the tracks. Try to get the smallest score possible
 
 Screen Shot:
 
@@ -10,6 +10,6 @@ Screen Shot:
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+A for left, D for right
 
 This game was built with [NEST](NEST.md).

@@ -7,10 +7,16 @@
 #include "Load.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
+#include "Victims.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <random>
+
+Load< Victims > victims_loaded(LoadTagDefault, []() -> Victims const * {
+	Victims const *ret = new Victims(data_path("victims.txt"));
+	return ret;
+});
 
 GLuint hexapod_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > train_scene_meshes(LoadTagDefault, []() -> MeshBuffer const * {
@@ -18,6 +24,7 @@ Load< MeshBuffer > train_scene_meshes(LoadTagDefault, []() -> MeshBuffer const *
 	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
 	return ret;
 });
+
 
 Load< Scene > train_scene(LoadTagDefault, []() -> Scene const * {
 	return new Scene(data_path("train_model.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
@@ -66,12 +73,12 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.key == SDLK_A) {
 			left.downs += 1;
 			left.pressed = true;
-			switch_position = -1;
+			if(!lock_switch_position) switch_position = -1;
 			return true;
 		} else if (evt.key.key == SDLK_D) {
 			right.downs += 1;
 			right.pressed = true;
-			switch_position = 1;
+			if(!lock_switch_position) switch_position= 1;
 			return true;
 		} else if (evt.key.key == SDLK_W) {
 			up.downs += 1;
@@ -184,7 +191,15 @@ void PlayMode::update(float elapsed) {
 	// 	glm::vec3(0.0f, 0.0f, 1.0f)
 	// );
 	//train movement
-	train->position = train->position + glm::vec3(train_speed, 0.0f, 0.0f);
+	if (!suicide) train->position = train->position + glm::vec3(train_speed, 0.0f, 0.0f);
+	// std::cout << "X: " << train->position.x << "Y: " << train->position.y << "Z: " << train->position.z <<std::endl;
+	if (train->position.x > 24){
+		lock_switch_position = true;
+		if (switch_position == 0) {
+			suicide = true;
+			
+		}
+	}
 
 	//move camera:
 	{
@@ -212,7 +227,7 @@ void PlayMode::update(float elapsed) {
 		glm::vec3 frame_forward = -frame[2];
 
 		// camera->transform->position += move.x * frame_right + move.y * frame_forward;
-		camera->transform->position += glm::vec3(train_speed, 0.0f, 0.0f);
+		if (!suicide) camera->transform->position += glm::vec3(train_speed, 0.0f, 0.0f);
 	}
 
 	//reset button press counters:
@@ -256,14 +271,29 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("left or right",
+		float ofs = 2.0f / drawable_size.y;
+		lines.draw_text(std::to_string(score),
 			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
-		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("left or right",
+		lines.draw_text(std::to_string(score),
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+
+		if (suicide){
+			
+			lines.draw_text("Your indecision leads to your death...",
+				glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0x00, 0x00, 0x00, 0x00));
+			
+			lines.draw_text("Your indecision leads to your death...",
+				glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + 0.1f * H + ofs, 0.0),
+				glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+				glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+
+		}
+		
 	}
 }

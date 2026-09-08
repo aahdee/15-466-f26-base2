@@ -46,7 +46,8 @@ struct PlayMode : Mode {
 
 	// switch
 	int switch_position = 0; // -1 is to the left, 1 is to the right 
-
+	bool lock_switch_position = false;
+	bool suicide = false;
 	
 	//camera:
 	Scene::Camera *camera = nullptr;
